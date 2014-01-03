@@ -1,6 +1,9 @@
 Attribute VB_Name = "mod_VersionControl"
 Sub export_modules_for_version_control()
+    Dim FSO
+
     Set objMyProj = Application.VBE.ActiveVBProject
+    Set FSO = CreateObject("Scripting.FileSystemObject")
      
     For Each objVBComp In objMyProj.VBComponents
         
@@ -19,17 +22,20 @@ Sub export_modules_for_version_control()
         ActiveWorkbook.SaveAs originalFileName
         UnzipAndPretty (gitSaveLocation)
         Application.DisplayAlerts = True
+
+        If FSO.FileExists(gitSaveLocation) Then
+          FSO.DeleteFile (gitSaveLocation)
+        End If
     On Error GoTo 0
      
 End Sub
 
 Function UnzipAndPretty(sPath)
 
-    Dim FSO, oApp
+    Dim oApp
     Dim gitXMLFolder As Folder
             
     Set oApp = CreateObject("Shell.Application")
-    Set FSO = CreateObject("Scripting.FileSystemObject")
     
     git_folder = ActiveWorkbook.Path & Application.PathSeparator & "git_xslm"
     
