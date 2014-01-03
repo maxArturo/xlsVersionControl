@@ -1,7 +1,7 @@
 Attribute VB_Name = "mod_VersionControl"
+Public FSO As FileSystemObject
 Sub export_modules_for_version_control()
-    Dim FSO
-
+    
     Set objMyProj = Application.VBE.ActiveVBProject
     Set FSO = CreateObject("Scripting.FileSystemObject")
      
@@ -39,7 +39,9 @@ Function UnzipAndPretty(sPath)
     
     git_folder = ActiveWorkbook.Path & Application.PathSeparator & "git_xslm"
     
-    If FSO.FolderExists(git_folder) Then: FSO.DeleteFolder (git_folder)
+    If FSO.FolderExists(git_folder) Then
+        FSO.DeleteFolder (git_folder)
+    End If
     FSO.CreateFolder (git_folder)
     
     oApp.Namespace(git_folder).CopyHere oApp.Namespace(sPath).Items
