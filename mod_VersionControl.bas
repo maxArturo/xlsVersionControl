@@ -4,29 +4,36 @@ Sub export_modules_for_version_control()
     
     Set objMyProj = Application.VBE.ActiveVBProject
     Set FSO = CreateObject("Scripting.FileSystemObject")
+    
+    vba_bas_folder = ActiveWorkbook.Path & Application.PathSeparator & Left(ActiveWorkbook.Name, Len(ActiveWorkbook.Name) - 5) & "_vba"
+    
+    If FSO.FolderExists(vba_bas_folder) Then
+        FSO.DeleteFolder (vba_bas_folder)
+    End If
+    FSO.CreateFolder (vba_bas_folder)
      
     For Each objVBComp In objMyProj.VBComponents
         
         'Modules are type 1, class modules type 2, forms are type 3
         If objVBComp.Type = 1 Or objVBComp.Type = 2 Then
-            objVBComp.Export ActiveWorkbook.Path & "\" & objVBComp.Name & ".bas"
+            objVBComp.Export vba_bas_folder & "\" & objVBComp.Name & ".bas"
         End If
     Next
     
     originalFileName = ActiveWorkbook.Path & Application.PathSeparator & ActiveWorkbook.Name
-    gitSaveLocation = ActiveWorkbook.Path & Application.PathSeparator & Left(ActiveWorkbook.Name, Len(ActiveWorkbook.Name) - 5) & "_git.zip"
+    gitsavelocation = ActiveWorkbook.Path & Application.PathSeparator & Left(ActiveWorkbook.Name, Len(ActiveWorkbook.Name) - 5) & "_git.zip"
 
-    On Error Resume Next
-        Application.DisplayAlerts = False
-        ActiveWorkbook.SaveAs gitSaveLocation
-        ActiveWorkbook.SaveAs originalFileName
-        UnzipAndPretty (gitSaveLocation)
-        Application.DisplayAlerts = True
+    Application.DisplayAlerts = False
+    ActiveWorkbook.SaveAs gitsavelocation
+    ActiveWorkbook.SaveAs originalFileName
+    UnzipAndPretty (gitsavelocation)
+    Application.DisplayAlerts = True
 
-        If FSO.FileExists(gitSaveLocation) Then
-          FSO.DeleteFile (gitSaveLocation)
-        End If
-    On Error GoTo 0
+    If FSO.FileExists(gitsavelocation) Then
+      FSO.DeleteFile (gitsavelocation)
+    End If
+    
+    Set FSO = Nothing
      
 End Sub
 
@@ -37,7 +44,7 @@ Function UnzipAndPretty(sPath)
             
     Set oApp = CreateObject("Shell.Application")
     
-    git_folder = ActiveWorkbook.Path & Application.PathSeparator & "git_xslm"
+    git_folder = ActiveWorkbook.Path & Application.PathSeparator & Left(ActiveWorkbook.Name, Len(ActiveWorkbook.Name) - 5) & "_git_xslm"
     
     If FSO.FolderExists(git_folder) Then
         FSO.DeleteFolder (git_folder)
@@ -52,7 +59,6 @@ Function UnzipAndPretty(sPath)
     Call cleanXMLinFolder(gitXMLFolder)
     
     Set oApp = Nothing
-    Set FSO = Nothing
     
 End Function
 
